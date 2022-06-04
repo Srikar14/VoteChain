@@ -14,12 +14,11 @@ contract Election {
         uint indexed _candidateId
     );
     constructor () public {
-        addCandidate("Narendra D Modi","Bharatiya Janata Party");
-        addCandidate("Rahul Gandhi","Indian National Congress");
-        addCandidate("Akhilesh Yadav","Samajvadi Party");
-        addCandidate("Mamta Banarjee","All India Trinamool Congress");
-        addCandidate("Mayavti","Bahujan Samaj Party");
-        addCandidate("NOTA","None of the above");
+        addCandidate("Srikar","Peoples Party of India");
+        addCandidate("Prajwal","All India Communist Party");
+        addCandidate("Ruthwik","Democratic Party of India");
+        addCandidate("Bala","Republican Party");
+        addCandidate("Narnia","Workers Party");
     }
     function addCandidate (string memory name,string memory party) private {
         candidatesCount ++;

@@ -16,7 +16,6 @@ App = {
     } else {
       // Specify default instance if no web3 instance provided
       App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
-      ethereum.enable();
       web3 = new Web3(App.web3Provider);
     }
     return App.initContract();
@@ -30,8 +29,6 @@ App = {
       App.contracts.Election.setProvider(App.web3Provider);
 
       App.listenForEvents();
-      App.listenForAccountChange();
-
       return App.render();
     });
   },
@@ -43,15 +40,10 @@ App = {
         toBlock: 'latest'
       }).watch(function (error, event) {
         console.log("event triggered", event)
+        App.empty();
         App.render();
       });
     });
-  },
-  listenForAccountChange: function () {
-    ethereum.on('accountsChanged', function (accounts) {
-      App.account = accounts[0];
-      App.render();
-    })
   },
 
   render: function () {
@@ -61,6 +53,14 @@ App = {
 
     loader.show();
     content.hide();
+
+
+    web3.eth.getCoinbase(function(err, account) {
+      if (err === null) {
+        App.account = account;
+        $("#accountAddress").html("Your Account: " + account);
+      }
+    });
 
     App.contracts.Election.deployed().then(function (instance) {
       electionInstance = instance;
@@ -87,25 +87,16 @@ App = {
       }
       return electionInstance.voters(App.account);
     }).then(function (hasVoted) {
-
-      if (hasVoted) {
-        $('form').hide();
-        $('#vote-msg').html(`<div class="col-sm-6 offset-sm-3 col-lg-6 offset-lg-3 col-md-6 offset-md-3">
-        <div class="alert alert-danger text-center" role="alert">
-          <span>Thanks For Voting !!</span>
-        </div>
-      </div>`)
-        $('#bv-voted').text(`Yes`)
-      }
-      else {
-        $('#bv-voted').text(`No`)
-
-      }
+        if(hasVoted) {
+          $("#accountAddress").html("Congradulations, Your vote has been casted!!!");
+          $('form').hide();
+        }
       loader.hide();
       content.show();
     }).catch(function (error) {
-      
+      console.warn(error);
     });
+    
   },
 
   castVote: function () {
@@ -122,6 +113,8 @@ App = {
     });
   }
 };
+
+  
 
 $(function () {
   $(window).load(function () {
